@@ -3,45 +3,67 @@ package com.barefi0012.asesmen2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.ViewModelProvider
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.barefi0012.asesmen2.ui.theme.Asesmen2Theme
 
 class MainActivity : ComponentActivity() {
+
+
+    private lateinit var viewModel: MedicationViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        )[MedicationViewModel::class.java]
+
         setContent {
-            Asesmen2Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            val isDarkTheme by viewModel.isDarkMode.collectAsState()
+
+            Asesmen2Theme(darkTheme = isDarkTheme) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    val navController = rememberNavController()
+
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") {
+                            HomeScreen(
+                                viewModel = viewModel,
+                                onNavigateToAdd = { navController.navigate("form/-1") },
+                                onNavigateToEdit = { id -> navController.navigate("form/$id") },
+                                onNavigateToBin = { navController.navigate("bin") }
+                            )
+                        }
+                        composable(
+                            route = "form/{medicationId}",
+                            arguments = listOf(navArgument("medicationId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("medicationId") ?: -1
+                            FormScreen(
+                                viewModel = viewModel,
+                                medicationId = if (id == -1) null else id,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable("bin") {
+                            RecycleBinScreen(viewModel = viewModel, onNavigateBack = { navController.popBackStack() })
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Asesmen2Theme {
-        Greeting("Android")
     }
 }

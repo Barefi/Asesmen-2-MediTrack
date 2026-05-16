@@ -1,3 +1,30 @@
 <resources>
-    <string name="app_name">Asesmen 2</string>
+    <string name="app_name">MediTrack</string>
+
+    <string name="home_title">MediTrack</string>
+    <string name="dark_mode_label">Dark Mode</string>
+    <string name="empty_home_msg">Tidak ada jadwal obat hari ini.</string>
+    <string name="desc_add_med">Tambah Obat</string>
+    <string name="desc_recycle_bin">Recycle Bin</string>
+    <string name="desc_delete_soft">Hapus Sementara</string>
+    <string name="med_info_format">Dosis: %1$s | Jam: %2$s</string>
+
+    <string name="form_add_title">Tambah Obat Baru</string>
+    <string name="form_edit_title">Edit Data Obat</string>
+    <string name="label_med_name">Nama Obat</string>
+    <string name="label_dosage">Dosis</string>
+    <string name="label_time">Waktu Minum</string>
+    <string name="btn_save_changes">Simpan Perubahan</string>
+    <string name="btn_add_schedule">Tambah Jadwal</string>
+    <string name="desc_back">Kembali</string>
+
+    <string name="bin_title">Recycle Bin</string>
+    <string name="empty_bin_msg">Recycle Bin kosong.</string>
+    <string name="desc_restore">Pulihkan</string>
+    <string name="desc_delete_perm">Hapus Absolut</string>
+
+    <string name="dialog_title">Hapus Obat Permanen?</string>
+    <string name="dialog_msg_format">Data \'%1$s\' akan dihapus secara permanen dari database lokal.</string>
+    <string name="btn_delete">Hapus</string>
+    <string name="btn_cancel">Batal</string>
 </resources>
