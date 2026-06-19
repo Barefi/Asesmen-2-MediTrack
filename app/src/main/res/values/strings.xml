@@ -47,4 +47,7 @@
     <string name="label_cloud_name">Nama Obat</string>
     <string name="label_cloud_details">Dosis, waktu, atau catatan</string>
     <string name="btn_send">Kirim</string>
+    <string name="desc_delete_cloud">Hapus catatan cloud</string>
+    <string name="delete_cloud_title">Hapus Catatan Cloud?</string>
+    <string name="delete_cloud_message">Catatan \"%1$s\" akan dihapus dari server jika data ini milik akunmu.</string>
 </resources>

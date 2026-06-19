@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,6 +31,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -71,6 +73,7 @@ fun CloudMedicationScreen(
     val status by viewModel.apiStatus.collectAsState()
     var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var showUploadDialog by remember { mutableStateOf(false) }
+    var selectedMedication by remember { mutableStateOf<RemoteMedication?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
@@ -117,7 +120,8 @@ fun CloudMedicationScreen(
                 CloudContent(
                     status = status,
                     medications = medications,
-                    onRetry = { viewModel.retrieveRemoteData(userProfile.email) }
+                    onRetry = { viewModel.retrieveRemoteData(userProfile.email) },
+                    onDelete = { selectedMedication = it }
                 )
             }
         }
@@ -130,6 +134,29 @@ fun CloudMedicationScreen(
             onSave = { name, details ->
                 viewModel.uploadRemoteMedication(userProfile.email, name, details, capturedBitmap!!)
                 showUploadDialog = false
+            }
+        )
+    }
+
+    selectedMedication?.let { medication ->
+        AlertDialog(
+            onDismissRequest = { selectedMedication = null },
+            title = { Text(stringResource(R.string.delete_cloud_title)) },
+            text = { Text(stringResource(R.string.delete_cloud_message, medication.name)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteRemoteMedication(userProfile.email, medication)
+                        selectedMedication = null
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedMedication = null }) {
+                    Text(stringResource(R.string.btn_cancel))
+                }
             }
         )
     }
@@ -166,7 +193,8 @@ private fun LoginRequiredContent(onLoginClick: () -> Unit) {
 private fun CloudContent(
     status: ApiStatus,
     medications: List<RemoteMedication>,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onDelete: (RemoteMedication) -> Unit
 ) {
     when (status) {
         ApiStatus.LOADING -> {
@@ -204,7 +232,10 @@ private fun CloudContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(medications, key = { it.imageId }) { medication ->
-                        RemoteMedicationCard(medication)
+                        RemoteMedicationCard(
+                            medication = medication,
+                            onDelete = { onDelete(medication) }
+                        )
                     }
                 }
             }
@@ -213,7 +244,10 @@ private fun CloudContent(
 }
 
 @Composable
-private fun RemoteMedicationCard(medication: RemoteMedication) {
+private fun RemoteMedicationCard(
+    medication: RemoteMedication,
+    onDelete: () -> Unit
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -248,6 +282,12 @@ private fun RemoteMedicationCard(medication: RemoteMedication) {
                     text = medication.details,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.desc_delete_cloud)
                 )
             }
         }
