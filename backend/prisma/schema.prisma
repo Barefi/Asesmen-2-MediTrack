@@ -11,7 +11,7 @@ model CloudMedicine {
   id         String      @id @default(uuid())
   ownerEmail String
   nama       String
-  namaLatin  String
+  detail     String
   imageId    String?
   image      ImageAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
   createdAt  DateTime    @default(now())

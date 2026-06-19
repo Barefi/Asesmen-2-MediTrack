@@ -2,7 +2,7 @@
 
 REST API Next.js untuk fitur cloud aplikasi Android MediTrack.
 
-Endpoint sengaja mempertahankan nama lama `/hewan.php` dan `/image.php?id=...` agar kompatibel dengan Retrofit/Moshi yang sudah ada di Android.
+Endpoint utama adalah `/obat`. Endpoint lama `/hewan.php` dan `/image.php?id=...` tetap tersedia hanya sebagai alias kompatibilitas modul/Android lama.
 
 ## Setup
 
@@ -45,26 +45,31 @@ TODO produksi: Android sebaiknya mengirim Google ID token, backend memverifikasi
 
 ## Endpoint
 
-### GET `/hewan.php`
+### GET `/obat`
 
 Response sukses berupa array langsung:
 
 ```json
 [
   {
+    "id": "uuid-row-id",
     "nama": "Paracetamol",
+    "detail": "500mg - 08:00",
     "namaLatin": "500mg - 08:00",
     "imageId": "uuid-file-id"
   }
 ]
 ```
 
-### POST `/hewan.php`
+`namaLatin` hanya alias legacy. Gunakan `detail` untuk kode baru. `id` adalah id row obat dan dipakai untuk operasi delete saat obat tidak punya gambar.
+
+### POST `/obat`
 
 Multipart form fields:
 
 - `nama`: wajib
-- `namaLatin`: wajib
+- `detail`: wajib
+- `namaLatin` atau `jadwal`: diterima sebagai alias legacy
 - `image`: opsional, menerima alias `gambar` atau `file`
 
 Response:
@@ -75,13 +80,14 @@ Response:
   "data": {
     "id": "uuid-row-id",
     "nama": "Paracetamol",
+    "detail": "500mg - 08:00",
     "namaLatin": "500mg - 08:00",
     "imageId": "uuid-file-id"
   }
 }
 ```
 
-### DELETE `/hewan.php?id={idOrImageId}`
+### DELETE `/obat?id={idOrImageId}`
 
 Menghapus data milik user. `id` boleh row id atau imageId agar kompatibel dengan Android yang mengirim `imageId`.
 
@@ -93,30 +99,34 @@ Mengambil gambar milik user yang sama. Gambar tidak public tanpa validasi header
 
 Endpoint legacy untuk Android saat ini. Behavior sama dengan `/images/{imageId}`.
 
+### Legacy `/hewan.php`
+
+`GET`, `POST`, dan `DELETE` `/hewan.php` tetap diarahkan ke handler obat. Pakai `/obat` untuk kode baru.
+
 ## Curl
 
 GET:
 
 ```bash
-curl -H "Authorization: user@email.com" http://localhost:3000/hewan.php
+curl -H "Authorization: user@email.com" http://localhost:3000/obat
 ```
 
 POST tanpa gambar:
 
 ```bash
-curl -X POST http://localhost:3000/hewan.php \
+curl -X POST http://localhost:3000/obat \
   -H "Authorization: user@email.com" \
   -F "nama=Paracetamol" \
-  -F "namaLatin=500mg - 08:00"
+  -F "detail=500mg - 08:00"
 ```
 
 POST dengan gambar:
 
 ```bash
-curl -X POST http://localhost:3000/hewan.php \
+curl -X POST http://localhost:3000/obat \
   -H "Authorization: user@email.com" \
   -F "nama=Paracetamol" \
-  -F "namaLatin=500mg - 08:00" \
+  -F "detail=500mg - 08:00" \
   -F "image=@./sample.jpg"
 ```
 
@@ -124,7 +134,7 @@ DELETE:
 
 ```bash
 curl -X DELETE -H "Authorization: user@email.com" \
-  "http://localhost:3000/hewan.php?id=uuid-file-id"
+  "http://localhost:3000/obat?id=uuid-file-id"
 ```
 
 Image:

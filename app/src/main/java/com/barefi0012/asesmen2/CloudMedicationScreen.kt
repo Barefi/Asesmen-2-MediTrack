@@ -20,8 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -50,11 +50,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.barefi0012.asesmen2.model.RemoteMedication
 import com.barefi0012.asesmen2.model.UserProfile
 import com.barefi0012.asesmen2.network.ApiStatus
@@ -93,7 +95,10 @@ fun CloudMedicationScreen(
                 title = { Text(stringResource(R.string.cloud_title)) },
                 navigationIcon = {
                     TextButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.desc_back))
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.desc_back)
+                        )
                     }
                 }
             )
@@ -120,6 +125,7 @@ fun CloudMedicationScreen(
                 CloudContent(
                     status = status,
                     medications = medications,
+                    ownerEmail = userProfile.email,
                     onRetry = { viewModel.retrieveRemoteData(userProfile.email) },
                     onDelete = { selectedMedication = it }
                 )
@@ -193,6 +199,7 @@ private fun LoginRequiredContent(onLoginClick: () -> Unit) {
 private fun CloudContent(
     status: ApiStatus,
     medications: List<RemoteMedication>,
+    ownerEmail: String,
     onRetry: () -> Unit,
     onDelete: (RemoteMedication) -> Unit
 ) {
@@ -231,9 +238,13 @@ private fun CloudContent(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(medications, key = { it.imageId }) { medication ->
+                    items(
+                        items = medications,
+                        key = { it.id ?: it.imageId ?: "${it.name}-${it.details}" }
+                    ) { medication ->
                         RemoteMedicationCard(
                             medication = medication,
+                            ownerEmail = ownerEmail,
                             onDelete = { onDelete(medication) }
                         )
                     }
@@ -246,15 +257,22 @@ private fun CloudContent(
 @Composable
 private fun RemoteMedicationCard(
     medication: RemoteMedication,
+    ownerEmail: String,
     onDelete: () -> Unit
 ) {
+    val context = LocalContext.current
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SubcomposeAsyncImage(
-                model = RemoteMedicationApi.imageUrl(medication.imageId),
+                model = medication.imageId?.let {
+                    ImageRequest.Builder(context)
+                        .data(RemoteMedicationApi.imageUrl(it))
+                        .addHeader("Authorization", ownerEmail)
+                        .build()
+                },
                 contentDescription = stringResource(R.string.cloud_image, medication.name),
                 modifier = Modifier
                     .size(88.dp)

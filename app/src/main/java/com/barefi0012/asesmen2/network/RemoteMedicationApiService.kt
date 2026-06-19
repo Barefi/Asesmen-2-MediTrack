@@ -31,24 +31,24 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface RemoteMedicationApiService {
-    @GET("hewan.php")
+    @GET("obat")
     suspend fun getMedications(
         @Header("Authorization") userId: String
     ): List<RemoteMedication>
 
     @Multipart
-    @POST("hewan.php")
+    @POST("obat")
     suspend fun postMedication(
         @Header("Authorization") userId: String,
         @Part("nama") name: RequestBody,
-        @Part("namaLatin") details: RequestBody,
+        @Part("detail") details: RequestBody,
         @Part image: MultipartBody.Part
     ): OperationStatus
 
-    @DELETE("hewan.php")
+    @DELETE("obat")
     suspend fun deleteMedication(
         @Header("Authorization") userId: String,
-        @Query("id") imageId: String
+        @Query("id") id: String
     ): OperationStatus
 }
 
@@ -58,7 +58,7 @@ object RemoteMedicationApi {
     }
 
     fun imageUrl(imageId: String): String {
-        return "${baseUrl}image.php?id=$imageId"
+        return "${baseUrl}images/$imageId"
     }
 }
 

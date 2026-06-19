@@ -16,3 +16,12 @@ export function getOptionalImageFile(formData: FormData): File | null {
 
   return null;
 }
+
+export function getFirstRequiredString(formData: FormData, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = getRequiredString(formData, key);
+    if (value) return value;
+  }
+
+  return null;
+}

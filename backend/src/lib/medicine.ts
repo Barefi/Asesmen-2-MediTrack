@@ -1,26 +1,34 @@
-type AndroidMedicine = {
+type MedicineRow = {
+  id?: string;
   nama: string;
+  detail: string;
+  imageId: string | null;
+};
+
+type WireMedicine = {
+  id?: string;
+  nama: string;
+  detail: string;
   namaLatin: string;
   imageId: string | null;
 };
 
-type MedicineRow = AndroidMedicine & {
-  id: string;
-};
-
-export function toAndroidMedicine(row: AndroidMedicine): AndroidMedicine {
+export function toAndroidMedicine(row: MedicineRow): WireMedicine {
   return {
+    id: row.id,
     nama: row.nama,
-    namaLatin: row.namaLatin,
+    detail: row.detail,
+    namaLatin: row.detail,
     imageId: row.imageId
   };
 }
 
-export function toMutationMedicine(row: MedicineRow) {
+export function toMutationMedicine(row: Required<Pick<MedicineRow, "id">> & MedicineRow) {
   return {
     id: row.id,
     nama: row.nama,
-    namaLatin: row.namaLatin,
+    detail: row.detail,
+    namaLatin: row.detail,
     imageId: row.imageId
   };
 }

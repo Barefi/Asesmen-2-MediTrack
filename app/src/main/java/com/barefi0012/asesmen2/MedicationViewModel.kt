@@ -114,10 +114,10 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
                 details = details.toRequestBody("text/plain".toMediaTypeOrNull()),
                 image = bitmap.toMultipartBody()
             )
-            if (result.status.equals("success", ignoreCase = true)) {
+            if (result.isSuccess) {
                 retrieveRemoteData(userId)
             } else {
-                _apiMessage.value = result.message ?: "Server menolak data yang dikirim."
+                _apiMessage.value = result.errorMessage ?: "Server menolak data yang dikirim."
             }
         } catch (e: Exception) {
             Log.d("MedicationViewModel", "Remote upload failed: ${e.message}")
@@ -135,14 +135,20 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
         }
 
         try {
-            val result = RemoteMedicationApi.service.deleteMedication(userId, medication.imageId)
-            if (result.status.equals("success", ignoreCase = true)) {
+            val deleteId = medication.id ?: medication.imageId
+            if (deleteId.isNullOrBlank()) {
+                _apiMessage.value = "Data ini tidak memiliki id untuk dihapus."
+                return@launch
+            }
+
+            val result = RemoteMedicationApi.service.deleteMedication(userId, deleteId)
+            if (result.isSuccess) {
                 _remoteMedications.value = _remoteMedications.value.filterNot {
-                    it.imageId == medication.imageId
+                    it.id == medication.id || it.imageId == medication.imageId
                 }
                 retrieveRemoteData(userId)
             } else {
-                _apiMessage.value = result.message ?: "Data tidak dapat dihapus dari server."
+                _apiMessage.value = result.errorMessage ?: "Data tidak dapat dihapus dari server."
             }
         } catch (e: Exception) {
             Log.d("MedicationViewModel", "Remote delete failed: ${e.message}")
