@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CloudMedicine {
+  id         String      @id @default(uuid())
+  ownerEmail String
+  nama       String
+  namaLatin  String
+  imageId    String?
+  image      ImageAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([ownerEmail])
+  @@index([imageId])
+}
+
+model ImageAsset {
+  id            String          @id @default(uuid())
+  ownerEmail    String
+  storageKey    String          @unique
+  originalName  String
+  mimeType      String
+  size          Int
+  createdAt     DateTime        @default(now())
+  cloudMedicine CloudMedicine[]
+
+  @@index([ownerEmail])
+}

@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+backend/.env
+backend/.next
+backend/node_modules
+backend/uploads
