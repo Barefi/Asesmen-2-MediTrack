@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,7 +25,7 @@ fun RecycleBinScreen(viewModel: MedicationViewModel, onNavigateBack: () -> Unit)
         topBar = {
             TopAppBar(
                 title = { Text("Recycle Bin") },
-                navigationIcon = { IconButton(onClick = onNavigateBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Kembali") } }
+                navigationIcon = { IconButton(onClick = onNavigateBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali") } }
             )
         }
     ) { paddingValues ->
@@ -42,7 +42,7 @@ fun RecycleBinScreen(viewModel: MedicationViewModel, onNavigateBack: () -> Unit)
                                 Text(text = med.name, style = MaterialTheme.typography.titleLarge)
                                 Text(text = "Dosis: ${med.dosage}")
                             }
-                            IconButton(onClick = { viewModel.undoDelete(med) }) { Icon(Icons.Default.Undo, contentDescription = "Pulihkan") }
+                            IconButton(onClick = { viewModel.undoDelete(med) }) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Pulihkan") }
                             IconButton(onClick = { selectedMedication = med; showDialog = true }) { Icon(Icons.Default.DeleteForever, contentDescription = "Hapus Absolut") }
                         }
                     }

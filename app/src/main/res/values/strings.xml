@@ -51,4 +51,7 @@
     <string name="desc_delete_cloud">Hapus catatan cloud</string>
     <string name="delete_cloud_title">Hapus Catatan Cloud?</string>
     <string name="delete_cloud_message">Catatan \"%1$s\" akan dihapus dari server jika data ini milik akunmu.</string>
+    <string name="btn_take_photo">Ambil Foto Obat</string>
+    <string name="btn_retake_photo">Ulangi Foto</string>
+    <string name="medication_photo">Foto obat %1$s</string>
 </resources>

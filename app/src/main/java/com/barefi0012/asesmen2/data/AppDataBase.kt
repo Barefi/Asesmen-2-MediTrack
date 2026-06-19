@@ -2,10 +2,12 @@ package com.barefi0012.asesmen2.data
 
 import android.content.Context
 import androidx.room.Database
+import androidx.room.migration.Migration
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Medication::class], version = 1, exportSchema = false)
+@Database(entities = [Medication::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun medicationDao(): MedicationDao
 
@@ -20,10 +22,17 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "meditrack_db"
                 )
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE medications ADD COLUMN photoPath TEXT")
             }
         }
     }

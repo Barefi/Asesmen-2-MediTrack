@@ -9,6 +9,7 @@ data class Medication(
     val name: String,
     val dosage: String,
     val time: String,
+    val photoPath: String? = null,
     val isTaken: Boolean = false,
     val isDeleted: Boolean = false
 )

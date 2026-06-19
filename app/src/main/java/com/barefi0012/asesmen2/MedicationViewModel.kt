@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import kotlin.math.min
@@ -54,8 +55,8 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
         return null
     }
 
-    fun insert(name: String, dosage: String, time: String) = viewModelScope.launch {
-        dao.insertMedication(Medication(name = name, dosage = dosage, time = time))
+    fun insert(name: String, dosage: String, time: String, photoPath: String?) = viewModelScope.launch {
+        dao.insertMedication(Medication(name = name, dosage = dosage, time = time, photoPath = photoPath))
     }
 
     fun update(medication: Medication) = viewModelScope.launch {
@@ -151,6 +152,23 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun clearApiMessage() {
         _apiMessage.value = null
+    }
+
+    fun saveLocalPhoto(bitmap: Bitmap): String? {
+        return try {
+            val directory = File(getApplication<Application>().filesDir, "medication_photos")
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
+            val file = File(directory, "medication_${System.currentTimeMillis()}.jpg")
+            file.outputStream().use { output ->
+                bitmap.centerCropSquare().compress(Bitmap.CompressFormat.JPEG, 85, output)
+            }
+            file.absolutePath
+        } catch (e: IOException) {
+            Log.d("MedicationViewModel", "Local photo save failed: ${e.message}")
+            null
+        }
     }
 
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {
