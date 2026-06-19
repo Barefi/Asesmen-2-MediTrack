@@ -17,6 +17,23 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 
 object AuthActions {
+    suspend fun signInWithEmail(userPreferences: UserPreferences, email: String): String? {
+        val normalizedEmail = email.trim().lowercase()
+        val isValidEmail = Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$").matches(normalizedEmail)
+
+        if (!isValidEmail) {
+            return "Email tidak valid."
+        }
+
+        userPreferences.saveUser(
+            UserProfile(
+                name = normalizedEmail.substringBefore("@"),
+                email = normalizedEmail
+            )
+        )
+        return null
+    }
+
     suspend fun signIn(context: Context, userPreferences: UserPreferences): String? {
         if (BuildConfig.API_KEY.isBlank()) {
             return "API_KEY belum diisi di local.properties."

@@ -31,10 +31,13 @@
     <string name="login_title">Login MediTrack</string>
     <string name="login_prompt">Login dengan akun Google agar data cloud yang kamu tambah hanya muncul untuk akunmu.</string>
     <string name="btn_google_login">Login Google</string>
+    <string name="btn_email_login">Login Email</string>
     <string name="btn_logout">Logout</string>
     <string name="btn_close">Tutup</string>
     <string name="profile_photo">Foto profil %1$s</string>
     <string name="desc_profile">Profil pengguna</string>
+    <string name="label_email">Email</string>
+    <string name="dev_login_prompt">API_KEY Google belum diisi. Untuk sementara, masuk memakai email agar fitur cloud bisa diuji.</string>
     <string name="desc_cloud">Buka MediTrack Cloud</string>
     <string name="cloud_title">MediTrack Cloud</string>
     <string name="cloud_login_required">Login terlebih dahulu untuk melihat dan mengelola catatan cloud milikmu.</string>

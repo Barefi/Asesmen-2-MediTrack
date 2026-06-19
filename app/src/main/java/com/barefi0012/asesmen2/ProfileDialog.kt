@@ -13,6 +13,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import com.barefi0012.asesmen2.BuildConfig
 import com.barefi0012.asesmen2.auth.AuthActions
 import com.barefi0012.asesmen2.data.UserPreferences
 import com.barefi0012.asesmen2.model.UserProfile
@@ -43,8 +45,10 @@ fun ProfileDialog(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val googleApiKeyAvailable = BuildConfig.API_KEY.isNotBlank()
     var isWorking by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
+    var email by remember { mutableStateOf("demo@meditrack.local") }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -78,9 +82,20 @@ fun ProfileDialog(
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = stringResource(R.string.login_prompt),
+                        text = stringResource(
+                            if (googleApiKeyAvailable) R.string.login_prompt else R.string.dev_login_prompt
+                        ),
                         textAlign = TextAlign.Center
                     )
+                    if (!googleApiKeyAvailable) {
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { email = it },
+                            label = { Text(stringResource(R.string.label_email)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
                 if (isWorking) {
@@ -104,6 +119,8 @@ fun ProfileDialog(
                         isWorking = true
                         message = if (userProfile.isLoggedIn) {
                             AuthActions.signOut(context, userPreferences)
+                        } else if (!googleApiKeyAvailable) {
+                            AuthActions.signInWithEmail(userPreferences, email)
                         } else {
                             AuthActions.signIn(context, userPreferences)
                         }
@@ -116,7 +133,11 @@ fun ProfileDialog(
             ) {
                 Text(
                     text = stringResource(
-                        if (userProfile.isLoggedIn) R.string.btn_logout else R.string.btn_google_login
+                        when {
+                            userProfile.isLoggedIn -> R.string.btn_logout
+                            googleApiKeyAvailable -> R.string.btn_google_login
+                            else -> R.string.btn_email_login
+                        }
                     )
                 )
             }
