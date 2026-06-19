@@ -35,4 +35,11 @@
     <string name="btn_close">Tutup</string>
     <string name="profile_photo">Foto profil %1$s</string>
     <string name="desc_profile">Profil pengguna</string>
+    <string name="cloud_title">MediTrack Cloud</string>
+    <string name="cloud_login_required">Login terlebih dahulu untuk melihat dan mengelola catatan cloud milikmu.</string>
+    <string name="btn_login">Login</string>
+    <string name="cloud_empty">Belum ada catatan cloud untuk akun ini.</string>
+    <string name="cloud_load_error">Gagal memuat data cloud.</string>
+    <string name="btn_try_again">Coba Lagi</string>
+    <string name="cloud_image">Foto catatan %1$s</string>
 </resources>
