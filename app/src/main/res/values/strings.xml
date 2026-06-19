@@ -27,4 +27,11 @@
     <string name="dialog_msg_format">Data \'%1$s\' akan dihapus secara permanen dari database lokal.</string>
     <string name="btn_delete">Hapus</string>
     <string name="btn_cancel">Batal</string>
+    <string name="profile_title">Profil Pengguna</string>
+    <string name="login_title">Login MediTrack</string>
+    <string name="login_prompt">Login dengan akun Google agar data cloud yang kamu tambah hanya muncul untuk akunmu.</string>
+    <string name="btn_google_login">Login Google</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_close">Tutup</string>
+    <string name="profile_photo">Foto profil %1$s</string>
 </resources>
