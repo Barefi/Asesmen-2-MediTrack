@@ -1,5 +1,9 @@
 package com.barefi0012.asesmen2
 
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,14 +20,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,8 +40,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -45,6 +57,7 @@ import com.barefi0012.asesmen2.model.RemoteMedication
 import com.barefi0012.asesmen2.model.UserProfile
 import com.barefi0012.asesmen2.network.ApiStatus
 import com.barefi0012.asesmen2.network.RemoteMedicationApi
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +69,14 @@ fun CloudMedicationScreen(
 ) {
     val medications by viewModel.remoteMedications.collectAsState()
     val status by viewModel.apiStatus.collectAsState()
+    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var showUploadDialog by remember { mutableStateOf(false) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        capturedBitmap = bitmap?.centerCropSquare()
+        showUploadDialog = capturedBitmap != null
+    }
 
     LaunchedEffect(userProfile.email) {
         if (userProfile.isLoggedIn) {
@@ -73,6 +94,16 @@ fun CloudMedicationScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (userProfile.isLoggedIn) {
+                FloatingActionButton(onClick = { cameraLauncher.launch(null) }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.desc_add_cloud)
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Box(
@@ -90,6 +121,17 @@ fun CloudMedicationScreen(
                 )
             }
         }
+    }
+
+    if (showUploadDialog && capturedBitmap != null) {
+        UploadMedicationDialog(
+            bitmap = capturedBitmap!!,
+            onDismissRequest = { showUploadDialog = false },
+            onSave = { name, details ->
+                viewModel.uploadRemoteMedication(userProfile.email, name, details, capturedBitmap!!)
+                showUploadDialog = false
+            }
+        )
     }
 }
 
@@ -210,4 +252,66 @@ private fun RemoteMedicationCard(medication: RemoteMedication) {
             }
         }
     }
+}
+
+@Composable
+private fun UploadMedicationDialog(
+    bitmap: Bitmap,
+    onDismissRequest: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var details by remember { mutableStateOf("") }
+    val canSave = name.isNotBlank() && details.isNotBlank()
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = stringResource(R.string.add_cloud_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.label_cloud_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = details,
+                    onValueChange = { details = it },
+                    label = { Text(stringResource(R.string.label_cloud_details)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = canSave,
+                onClick = { onSave(name.trim(), details.trim()) }
+            ) {
+                Text(text = stringResource(R.string.btn_send))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.btn_cancel))
+            }
+        }
+    )
+}
+
+private fun Bitmap.centerCropSquare(): Bitmap {
+    val size = min(width, height)
+    val x = (width - size) / 2
+    val y = (height - size) / 2
+    return Bitmap.createBitmap(this, x, y, size, size)
 }

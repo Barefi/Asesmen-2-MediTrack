@@ -42,4 +42,9 @@
     <string name="cloud_load_error">Gagal memuat data cloud.</string>
     <string name="btn_try_again">Coba Lagi</string>
     <string name="cloud_image">Foto catatan %1$s</string>
+    <string name="desc_add_cloud">Tambah catatan cloud</string>
+    <string name="add_cloud_title">Tambah Catatan Cloud</string>
+    <string name="label_cloud_name">Nama Obat</string>
+    <string name="label_cloud_details">Dosis, waktu, atau catatan</string>
+    <string name="btn_send">Kirim</string>
 </resources>
