@@ -54,6 +54,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToAdd = { navController.navigate("form/-1") },
                                 onNavigateToEdit = { id -> navController.navigate("form/$id") },
                                 onNavigateToBin = { navController.navigate("bin") },
+                                onNavigateToCloud = { navController.navigate("cloud") },
                                 onShowProfile = { showProfileDialog = true }
                             )
                         }
@@ -70,6 +71,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("bin") {
                             RecycleBinScreen(viewModel = viewModel, onNavigateBack = { navController.popBackStack() })
+                        }
+                        composable("cloud") {
+                            CloudMedicationScreen(
+                                viewModel = viewModel,
+                                userProfile = userProfile,
+                                onNavigateBack = { navController.popBackStack() },
+                                onLoginClick = { showProfileDialog = true }
+                            )
                         }
                     }
                     if (showProfileDialog) {

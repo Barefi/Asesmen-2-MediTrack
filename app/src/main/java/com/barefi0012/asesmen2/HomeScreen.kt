@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.*
@@ -25,6 +26,7 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToBin: () -> Unit,
+    onNavigateToCloud: () -> Unit,
     onShowProfile: () -> Unit
 ) {
     val medications by viewModel.medications.collectAsState()
@@ -45,6 +47,12 @@ fun HomeScreen(
                     }
                     IconButton(onClick = onNavigateToBin) {
                         Icon(Icons.Default.DeleteSweep, contentDescription = "Recycle Bin")
+                    }
+                    IconButton(onClick = onNavigateToCloud) {
+                        Icon(
+                            imageVector = Icons.Default.CloudQueue,
+                            contentDescription = stringResource(R.string.desc_cloud)
+                        )
                     }
                     IconButton(onClick = onShowProfile) {
                         Icon(

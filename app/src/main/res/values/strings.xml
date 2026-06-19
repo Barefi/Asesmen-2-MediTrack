@@ -35,6 +35,7 @@
     <string name="btn_close">Tutup</string>
     <string name="profile_photo">Foto profil %1$s</string>
     <string name="desc_profile">Profil pengguna</string>
+    <string name="desc_cloud">Buka MediTrack Cloud</string>
     <string name="cloud_title">MediTrack Cloud</string>
     <string name="cloud_login_required">Login terlebih dahulu untuk melihat dan mengelola catatan cloud milikmu.</string>
     <string name="btn_login">Login</string>
