@@ -30,7 +30,6 @@ export async function GET(request: Request) {
     }
   });
 
-  // Android lama memakai Retrofit/Moshi yang mengharapkan array langsung.
   return NextResponse.json(medicines.map(toAndroidMedicine));
 }
 

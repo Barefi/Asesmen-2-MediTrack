@@ -41,7 +41,7 @@ Authorization: user@email.com
 
 Semua query memfilter `ownerEmail` dari header ini. Jangan menerima `ownerEmail` dari body request.
 
-TODO produksi: Android sebaiknya mengirim Google ID token, backend memverifikasi token Google, lalu mengambil email dari token valid.
+Catatan produksi: Android sebaiknya mengirim Google ID token, backend memverifikasi token Google, lalu mengambil email dari token valid.
 
 ## Endpoint
 

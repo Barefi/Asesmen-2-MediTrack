@@ -69,7 +69,6 @@ export async function deleteImageFile(storageKey: string) {
   try {
     await fs.unlink(resolveStoragePath(storageKey));
   } catch {
-    // File cleanup should not make a successful database mutation fail.
   }
 }
 
