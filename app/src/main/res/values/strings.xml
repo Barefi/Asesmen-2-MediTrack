@@ -38,6 +38,12 @@
     <string name="desc_profile">Profil pengguna</string>
     <string name="label_email">Email</string>
     <string name="dev_login_prompt">API_KEY Google belum diisi. Untuk sementara, masuk memakai email agar fitur cloud bisa diuji.</string>
+    <string name="local_guest_empty">Belum ada jadwal obat di mode tamu.</string>
+    <string name="crop_photo_title">Crop Foto Obat</string>
+    <string name="crop_zoom_label">Zoom</string>
+    <string name="crop_horizontal_label">Geser Horizontal</string>
+    <string name="crop_vertical_label">Geser Vertikal</string>
+    <string name="btn_use_photo">Gunakan Foto</string>
     <string name="desc_cloud">Buka MediTrack Cloud</string>
     <string name="cloud_title">MediTrack Cloud</string>
     <string name="cloud_login_required">Login terlebih dahulu untuk melihat dan mengelola catatan cloud milikmu.</string>

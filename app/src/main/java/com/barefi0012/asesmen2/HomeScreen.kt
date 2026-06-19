@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CloudQueue
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.*
@@ -33,10 +32,13 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Int) -> Unit,
     onNavigateToBin: () -> Unit,
-    onNavigateToCloud: () -> Unit,
     onShowProfile: () -> Unit
 ) {
-    val medications by viewModel.medications.collectAsState()
+    val activeOwnerEmail = userProfile.email.ifBlank { MedicationViewModel.GUEST_OWNER }
+    val medicationFlow = remember(activeOwnerEmail) {
+        viewModel.getMedications(activeOwnerEmail)
+    }
+    val medications by medicationFlow.collectAsState(emptyList())
     val isDark by viewModel.isDarkMode.collectAsState()
 
     Scaffold(
@@ -54,12 +56,6 @@ fun HomeScreen(
                     }
                     IconButton(onClick = onNavigateToBin) {
                         Icon(Icons.Default.DeleteSweep, contentDescription = "Recycle Bin")
-                    }
-                    IconButton(onClick = onNavigateToCloud) {
-                        Icon(
-                            imageVector = Icons.Default.CloudQueue,
-                            contentDescription = stringResource(R.string.desc_cloud)
-                        )
                     }
                     IconButton(onClick = onShowProfile) {
                         Icon(
@@ -83,7 +79,13 @@ fun HomeScreen(
     ) { paddingValues ->
         if (medications.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
-                Text("Tidak ada jadwal obat hari ini.")
+                Text(
+                    text = if (userProfile.isLoggedIn) {
+                        "Tidak ada jadwal obat hari ini."
+                    } else {
+                        stringResource(R.string.local_guest_empty)
+                    }
+                )
             }
         } else {
             LazyColumn(modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -16,8 +16,15 @@ import com.barefi0012.asesmen2.data.Medication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecycleBinScreen(viewModel: MedicationViewModel, onNavigateBack: () -> Unit) {
-    val deletedMedications by viewModel.deletedMedications.collectAsState()
+fun RecycleBinScreen(
+    viewModel: MedicationViewModel,
+    ownerEmail: String,
+    onNavigateBack: () -> Unit
+) {
+    val deletedMedicationFlow = remember(ownerEmail) {
+        viewModel.getDeletedMedications(ownerEmail)
+    }
+    val deletedMedications by deletedMedicationFlow.collectAsState(emptyList())
     var showDialog by remember { mutableStateOf(false) }
     var selectedMedication by remember { mutableStateOf<Medication?>(null) }
 

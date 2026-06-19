@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,14 +28,12 @@ import java.io.IOException
 import kotlin.math.min
 
 class MedicationViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        const val GUEST_OWNER = "__guest__"
+    }
+
     private val dao = AppDatabase.getDatabase(application).medicationDao()
     private val themePrefs = ThemePreferences(application)
-
-    val medications: StateFlow<List<Medication>> = dao.getAllActiveMedications()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val deletedMedications: StateFlow<List<Medication>> = dao.getDeletedMedications()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val isDarkMode: StateFlow<Boolean> = themePrefs.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -55,8 +55,38 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
         return null
     }
 
-    fun insert(name: String, dosage: String, time: String, photoPath: String?) = viewModelScope.launch {
-        dao.insertMedication(Medication(name = name, dosage = dosage, time = time, photoPath = photoPath))
+    fun getMedications(ownerEmail: String): Flow<List<Medication>> {
+        return if (ownerEmail.isBlank()) {
+            flowOf(emptyList())
+        } else {
+            dao.getAllActiveMedications(ownerEmail)
+        }
+    }
+
+    fun getDeletedMedications(ownerEmail: String): Flow<List<Medication>> {
+        return if (ownerEmail.isBlank()) {
+            flowOf(emptyList())
+        } else {
+            dao.getDeletedMedications(ownerEmail)
+        }
+    }
+
+    fun insert(
+        ownerEmail: String,
+        name: String,
+        dosage: String,
+        time: String,
+        photoPath: String?
+    ) = viewModelScope.launch {
+        dao.insertMedication(
+            Medication(
+                ownerEmail = ownerEmail,
+                name = name,
+                dosage = dosage,
+                time = time,
+                photoPath = photoPath
+            )
+        )
     }
 
     fun update(medication: Medication) = viewModelScope.launch {
@@ -80,8 +110,8 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     val currentMedication = MutableStateFlow<Medication?>(null)
-    fun loadMedicationById(id: Int) = viewModelScope.launch {
-        currentMedication.value = dao.getMedicationById(id)
+    fun loadMedicationById(id: Int, ownerEmail: String) = viewModelScope.launch {
+        currentMedication.value = dao.getMedicationById(id, ownerEmail)
     }
 
     fun retrieveRemoteData(userId: String) = viewModelScope.launch(Dispatchers.IO) {

@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
             val isDarkTheme by viewModel.isDarkMode.collectAsState()
             val userPreferences = remember { UserPreferences(applicationContext) }
             val userProfile by userPreferences.userProfile.collectAsState(UserProfile())
+            val activeOwnerEmail = userProfile.email.ifBlank { MedicationViewModel.GUEST_OWNER }
             var showProfileDialog by remember { mutableStateOf(false) }
 
             Asesmen2Theme(darkTheme = isDarkTheme) {
@@ -54,7 +55,6 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToAdd = { navController.navigate("form/-1") },
                                 onNavigateToEdit = { id -> navController.navigate("form/$id") },
                                 onNavigateToBin = { navController.navigate("bin") },
-                                onNavigateToCloud = { navController.navigate("cloud") },
                                 onShowProfile = { showProfileDialog = true }
                             )
                         }
@@ -66,18 +66,15 @@ class MainActivity : ComponentActivity() {
                             FormScreen(
                                 viewModel = viewModel,
                                 medicationId = if (id == -1) null else id,
+                                ownerEmail = activeOwnerEmail,
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
                         composable("bin") {
-                            RecycleBinScreen(viewModel = viewModel, onNavigateBack = { navController.popBackStack() })
-                        }
-                        composable("cloud") {
-                            CloudMedicationScreen(
+                            RecycleBinScreen(
                                 viewModel = viewModel,
-                                userProfile = userProfile,
-                                onNavigateBack = { navController.popBackStack() },
-                                onLoginClick = { showProfileDialog = true }
+                                ownerEmail = activeOwnerEmail,
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                     }
