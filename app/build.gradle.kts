@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,8 +7,24 @@ plugins {
 
 }
 
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use { load(it) }
+    }
+}
+
+fun localProperty(name: String, defaultValue: String = ""): String {
+    return (localProperties.getProperty(name) ?: defaultValue).trim().trim('"')
+}
+
+fun buildConfigString(value: String): String {
+    val escaped = value.replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"$escaped\""
+}
+
 android {
-    namespace = "com.barefi0012.myapplication"
+    namespace = "com.barefi0012.asesmen2"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -14,13 +32,19 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.barefi0012.myapplication"
+        applicationId = "com.barefi0012.asesmen2"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", buildConfigString(localProperty("API_KEY")))
+        buildConfigField(
+            "String",
+            "API_BASE_URL",
+            buildConfigString(localProperty("API_BASE_URL", "https://gh.d3ifcool.org/"))
+        )
     }
 
     buildTypes {
@@ -38,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -56,6 +81,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
